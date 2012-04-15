@@ -1,7 +1,7 @@
 # python-machine_tests.py
 
 from nose.tools import *
-import python-machine
+import python_machine
 
 def setup():
     print "SETUP!"
