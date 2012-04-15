@@ -5,37 +5,6 @@
 # Author: Peter Urbak
 # Version: 2012-04-15
 
-# Special blank character: #
-# Alphabet: a list of symbols
-# Tape: an infinite List
-# Head: a tuple (index, symbol)
-# Table (transition function): 5 tuples (q_i a_j -> q_i1 a_j1 d_k)
-# - Either erase or write a symbol (a_j -> a_j1) then
-# - Move the head in direction: d_k (L,R,N), then
-# - Assume the same or a new state as prescribed (go to state q_i1)
-# if no combination of symbol and state in table -> halt or require all entries
-# to be filled prior
-# State Register: stores the state: finitely many and a special start state
-
-# Formal definition
-# 7-Tuple $M = \tuple{Q, Gamma, b, Sigma, delta, q_0, F}
-# - Q: a finite non-empty set of states
-# - Gamma: finite non-empty set of tape alphabet/symbols
-# - b \in Gamma: the blank symbol
-# - Sigma \subset Gamma\\\{b\}: the set of input symbols
-# - q_0 \in Q: the initial state
-# - F \subset Q: the set of final/accepting states
-# - delta: Q\F x Gamma -> Q\F x Gamma x {L,R}: transition function
-
-# Busy Beaver:
-# Q = {A, B, C, HALT}
-# Gamma = {0,1}
-# b = 0 = "blank"
-# Sigma = {1}
-# delta = (see state table)
-# q_0 = A
-# F = the one element set of final states {HALT}
-
 class TuringMachine(object):
     """A Turing Machine
 
@@ -45,7 +14,7 @@ class TuringMachine(object):
 
     """
 
-    # --*-- Fields --*--
+    # --*-- Properties --*--
 
     hasAccepted = False
     hasHalted = False
@@ -113,7 +82,7 @@ class TuringMachine(object):
 
         @param tape: The input tape; a list of symbols composing the intended
                      input value for the turing machine.
-        @type tape: list
+        @type tape: list of strings
 
         """
         self.hasAccepted = False
