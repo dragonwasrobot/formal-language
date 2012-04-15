@@ -2,7 +2,7 @@ Python Machine
 ======================
 
 ## What is this?
-A Turing Machine written in Python
+A Turing Machine written in Python.
 
 ## General
 
@@ -14,4 +14,5 @@ A Turing Machine written in Python
 
 ## To-do
 
-* Write a Turing Machine.
+* Make the code more self-explanatory
+* Create some preset turing machine examples
