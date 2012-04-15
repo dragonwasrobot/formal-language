@@ -1,0 +1,5 @@
+# Git ignore file
+*~
+*.pyc
+
+# end-of-.gitignore
