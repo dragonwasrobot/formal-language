@@ -6,16 +6,17 @@ except ImportError:
     from distutils.core import setup
 
 config = {
-    'description' : 'A Turing Machine written in Python',
+    'description' : 'A Package containing constructs used in formal language
+    theory.',
     'author' : 'Peter Urbak',
-    'url' : 'https://github.com/dragonwasrobot/python-machine',
-    'download_url' : 'https://github.com/dragonwasrobot/python-machine',
+    'url' : 'https://github.com/dragonwasrobot/formal-language',
+    'download_url' : 'https://github.com/dragonwasrobot/formal-language',
     'author_email' : 'peter@dragonwasrobot.com',
-    'version' : '0.1',
+    'version' : '0.2',
     'install_requires' : ['nose'],
-    'packages' : ['python-machine'],
+    'packages' : ['formal-language'],
     'scripts' : [],
-    'name' : 'python-machine'
+    'name' : 'formal-language'
     }
 
 setup(**config)

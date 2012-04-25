@@ -1,9 +1,9 @@
-# python_machine.py
+# turing_machine.py
 
-# A Turing Machine written in Python.
+# A Turing Machine implementation.
 #
 # Author: Peter Urbak
-# Version: 2012-04-15
+# Version: 2012-04-25
 
 class TuringMachine(object):
     """A Turing Machine
@@ -126,4 +126,4 @@ class TuringMachine(object):
 
         return tape
 
-# end-of-python_machine.py
+# end-of-turing_machine.py

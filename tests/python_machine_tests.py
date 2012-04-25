@@ -1,7 +1,7 @@
 # python-machine_tests.py
 
 from nose.tools import *
-from python_machine.python_machine import *
+from formal_language.turing_machine import *
 
 states = ['A','F']
 alphabet = ['1', '#']
@@ -24,4 +24,4 @@ def test_run():
     assert_equal(tm.run(['1','1','1']), ['1','1','1','1'])
     assert_equal(tm.run(['2']), ['HALT'])
 
-# end-of-python-machine_tests.py
+# end-of-turing_machine_tests.py
