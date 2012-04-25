@@ -1,4 +1,4 @@
-# python-machine_tests.py
+# turing_machine_tests.py
 
 from nose.tools import *
 from formal_language.turing_machine import *
