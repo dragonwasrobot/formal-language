@@ -4,10 +4,10 @@ from nose.tools import *
 from formal_language.finite_automata import *
 
 # The FA which accepts all strings in {0,1}* ending in 11.
-states = ['a', 'b', 'c']
-alphabet = ['0','1']
+states = frozenset(['a', 'b', 'c'])
+alphabet = frozenset(['0','1'])
 initial = 'a'
-accept = ['c']
+accept = frozenset(['c'])
 transitions = {('a', '0') : 'a', ('a', '1') : 'b',
                ('b', '0') : 'a', ('b', '1') : 'c',
                ('c', '0') : 'a', ('c', '1') : 'c'}
@@ -47,8 +47,12 @@ def test_accepts():
     # Negative test
     assert_false(fa.accepts('10110'))
 
-def test_correctness():
-    pass
+def test_complement():
+    # Postive test
+    faComp = fa.complement()
+    assert_true(faComp.accepts('10110'))
+    # Negative test
+    assert_false(faComp.accepts('10111'))
 
 
 # end-of-turing_machine_tests.py
