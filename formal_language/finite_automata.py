@@ -5,13 +5,27 @@
 # regular languages.
 #
 # Author: Peter Urbak
-# Version: 2012-04-26
+# Version: 2012-04-28
 import copy
 
 # --*-- The Finite Automata --*--
 
 class FiniteAutomata(object):
-    """A Finite Automata."""
+    """A Finite Automata.
+
+    Definition 1: A Finite Automaton
+    A finite automaton (FA) is a 5-tuple (Q, \Sigma, q_0, A, \deta), where
+
+    Q is a finite set of states;
+    \Sigma is a finite input alphabet;
+    q_0 \in Q is the initial state;
+    A \subseteq Q is the set of accepting states;
+    \delta: Q \times \Sigma \to Q is the transition function.
+
+    For any element in q of Q and any symbol \sigma \in Sigma, we interpret
+    \delta(q, \sigma) as the state to which the FA moves, if it is in state q
+    and receives the input \sigma.
+    """
 
     # --*-- Constructors --*--
 
@@ -41,6 +55,8 @@ class FiniteAutomata(object):
         self.initial = initial
         self.accept = accept
         self.transitions = transitions
+
+        # TODO: Sanitize input, especially alphabet symbols.
 
     # --*-- Methods --*--
 
@@ -77,7 +93,29 @@ class FiniteAutomata(object):
 
     def deltaStar(self, q, s):
         """Runs the given string on the Finite Automata and returns the state it
-        ends up in."""
+        ends up in.
+
+        Definition 2: The Extended Transition Function \delta*
+
+        Let M = (Q, \Sigma, q_0, A, \deta) be a finite automaton. We define the
+        extended transition function
+
+        \delta* : Q \times \Sigma* \to Q
+
+        as follows:
+
+        1. For every q \in Q, \delta*(q, \Lambda) = q
+        2. For every q \in Q, every y \in \Sigma*, and every \sigma \in \Sigma,
+
+        \delta*(q, y\sigma) = \delta(\delta*(q,y),\sigma).
+
+        @param q: a state
+        @type q: str
+
+        @param s: a string of alphabet symbols
+        @type s: str
+
+        """
         for c in s:
             if c not in self.alphabet:
                 raise IllegalCharacterError(c)
@@ -87,7 +125,27 @@ class FiniteAutomata(object):
 
     def accepts(self, s):
         """Runs the given string on the Finite Automata and returns true if the
-        string is accepted by the automata, false otherwise."""
+        string is accepted by the automata, false otherwise.
+
+        Definition 3: Acceptance by a Finite Automaton
+
+        Let M = (Q, \Sigma, q_0, A, \delta) be an FA, and let x \in \Sigma*. The
+        string x is accepted by M if
+
+        \delta*(q_0,x) \in A
+
+        and is rejected by M otherwise.
+
+        The language accepted by M is the set
+
+        L(M) = {x \in \Sigma* | x is accepted by M}
+
+        if L is a language over \Sigma, L is accepted by M if and only if
+        L = L(M).
+
+        @param s: a string of alphabet symbols
+        @type s: str
+        """
         return self.deltaStar(self.initial, s) in self.accept
 
     def toRegExp(self):
@@ -158,8 +216,34 @@ class FiniteAutomata(object):
         """Returns a new automaton whose language is the intersection of the
         language of this automaton and the language of the given
         automaton. [Martin, Th. 3.4]"""
-        # TODO
-        pass
+        if self.alphabet != fa.alphabet:
+            raise IllegalArgumentError(fa.alphabet)
+
+        stateDictionary = {}
+        stateList = []
+        alphabet = self.alphabet
+        initial = ''
+        accept = []
+        transitions = {}
+
+        for q in self.states:
+            for r in fa.states:
+                state = q + r
+                stateDictionary[(q,r)] = state
+
+                if q in self.accept and r in fa.accept:
+                    accept.append(state)
+
+        for k, v in stateDictionary:
+            stateList.append(v)
+            for c in alphabet:
+                state1 = self.delta(v[0], c)
+                state2 = fa.delta(v[1], c)
+                transitions[(v,c)] = stateDictionary[(state1, state2)]
+
+        initial = stateDictionary[(self.initial, fa.initial)]
+        states = frozenset(stateList)
+        return FiniteAutomata(states, alphabet, initial, accept, transitions)
 
     def union(self, fa):
         """Returns a new automaton whose language is the union of the
@@ -176,6 +260,19 @@ class FiniteAutomata(object):
         pass
 
 # --*-- Exceptions --*--
+
+class IllegalArgumentError(Exception):
+    """This error is raised when an illegal argument has been passed to a
+    method."""
+
+    def __init__(self, argument):
+        """Initializes an IllegalArgumentError object."""
+        self.argument = argument
+
+    def __str__(self):
+        """Returns a the illegal argument."""
+        return repr(self.argument)
+
 
 class IllegalCharacterError(Exception):
     """This error is raised whenever a character not found in a Finite Automatas

@@ -20,6 +20,9 @@ Turing Machine.
   * Fill out all the remaining stubs.
   * Implement a Nondeterministic version.
   * Create a set of test automatas.
+  * Sanity check input:
+    * Alphabet shouldn't be able to use special symbols
+    * Alphabet symbols have length 1
 
 * Push-down Automata.
   * Implement one.

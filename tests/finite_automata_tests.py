@@ -54,5 +54,25 @@ def test_complement():
     # Negative test
     assert_false(faComp.accepts('10111'))
 
+def test_intersection():
+    statesM1 = frozenset(['a', 'b', 'c'])
+    alphabet = frozenset(['0','1'])
+    initialM1 = 'a'
+    acceptM1 = frozenset(['c'])
+    transitionsM1 = { ('a', '0') : 'b', ('a', '1') : 'a',
+                      ('b', '0') : 'b', ('b', '1') : 'c',
+                      ('c', '0') : 'b', ('c', '1') : 'a' }
+    m1 = FiniteAutomata
+
+    statesM2 = frozenset(['r','s'])
+    initialM2 = 'r'
+    accept = frozenset(['s'])
+    transitionsM2 = {('r', '0') : 's', ('r', '1') : 's',
+                     ('s', '0') : 'r', ('s', '1') : 'r'}
+
+
+    fa = FiniteAutomata(states, alphabet, initial, accept, transitions)
+
+
 
 # end-of-turing_machine_tests.py
