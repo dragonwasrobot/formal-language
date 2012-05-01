@@ -150,7 +150,7 @@ class FiniteAutomata(object):
 
     def toRegExp(self):
         """Converts the Finite Automata to its equivalent regular
-        expression. [Martin Th. 4.5]"""
+        expression."""
         # TODO
         pass
 
@@ -172,7 +172,7 @@ class FiniteAutomata(object):
 
     def removeUnreachableStates(self):
         """Returns a new automaton with the same language as this automaton
-        but without unreachable states. [Martin Exercise 3.29]"""
+        but without unreachable states."""
         # TODO
         pass
 
@@ -183,26 +183,24 @@ class FiniteAutomata(object):
         pass
 
     def isFinite(self):
-        """Returns true if the language of this automaton is finite. [Martin,
-        Sec 5.4]"""
+        """Returns true if the language of this automaton is finite."""
         # TODO
         pass
 
     def isEmpty(self):
-        """Returns true if the language of the automaton is empty. [Martin,
-        Sec. 5.4]"""
+        """Returns true if the language of the automaton is empty."""
         # TODO
         pass
 
     def subsetOf(self, fa):
         """Returns true if the language of this automaton is a subset of the
-        language of the given automaton. [Martin, Sec. 5.4]"""
+        language of the given automaton."""
         # TODO
         pass
 
     def equals(self, fa):
         """Returns true if the language of this automaton is equal to the
-        language of the given automaton. [Martin, Sec. 5.4]"""
+        language of the given automaton."""
         # TODO
         pass
 
@@ -399,134 +397,3 @@ class AutomatonNotWellDefinedException(Exception):
         return repr(self.message)
 
 # end-of-finite_automata.py
-
-'''
-    /**
-     * Returns <a href="http://www.research.att.com/sw/tools/graphviz/" target="_top">Graphviz Dot</a>
-     * representation of this automaton.
-     * (To convert a dot file to postscript, run '<tt>dot -Tps -o file.ps file.dot</tt>'.)
-     */
-    public String toDot()
-    {
-        StringBuffer b = new StringBuffer("digraph Automaton {\n");
-        b.append("  rankdir = LR;\n");
-        Map<State,Integer> id = new HashMap<State,Integer>();
-        for (State s : states)
-            id.put(s, Integer.valueOf(id.size()));
-        for (State s : states) {
-            b.append("  ").append(id.get(s));
-            if (accept.contains(s))
-                b.append(" [shape=doublecircle,label=\""+s.name+"\"];\n");
-            else
-                b.append(" [shape=circle,label=\""+s.name+"\"];\n");
-            if (s==initial) {
-                b.append("  in [shape=plaintext,label=\"\"];\n");
-                b.append("  in -> ").append(id.get(s)).append(";\n");
-            }
-        }
-        for (Map.Entry<StateSymbolPair,State> e : transitions.entrySet())
-        {
-            StateSymbolPair ssp = e.getKey();
-            State q = e.getValue();
-            b.append("  ").append(id.get(ssp.state)).append(" -> ").append(id.get(q));
-            b.append(" [label=\"");
-            char c = ssp.symbol.charValue();
-            if (c>=0x21 && c<=0x7e && c!='\\' && c!='%')
-                b.append(c);
-            else
-            {
-                b.append("\\u");
-                String s = Integer.toHexString(c);
-                if (c<0x10)
-                    b.append("000").append(s);
-                else if (c<0x100)
-                    b.append("00").append(s);
-                else if (c<0x1000)
-                    b.append("0").append(s);
-                else
-                    b.append(s);
-            }
-            b.append("\"];\n");
-        }
-        return b.append("}\n").toString();
-    }
-
-
-    public FA checkWellDefined() throws AutomatonNotWellDefinedException {
-        if (states==null || alphabet==null || alphabet.symbols==null ||
-            initial==null || accept==null || transitions==null)
-            throw new AutomatonNotWellDefinedException("invalid null pointer");
-        if (!states.contains(initial))
-            throw new AutomatonNotWellDefinedException("the initial state is not in the state set");
-        if (!states.containsAll(accept))
-            throw new AutomatonNotWellDefinedException("not all accept states are in the state set");
-        for (State s : states)
-            for (char c : alphabet.symbols) {
-                if (c==NFALambda.LAMBDA)
-                    throw new AutomatonNotWellDefinedException("lambda transition appears in transitions");
-                State s2 = transitions.get(new StateSymbolPair(s, c));
-                if (s2==null)
-                    throw new AutomatonNotWellDefinedException("transition function is not total");
-                if (!states.contains(s2))
-                    throw new AutomatonNotWellDefinedException("there is a transition to a state that is not in state set");
-            }
-        for (StateSymbolPair sp : transitions.keySet())
-        {
-            if (!states.contains(sp.state))
-                throw new AutomatonNotWellDefinedException("transitions refer to a state not in the state set");
-            if (!alphabet.symbols.contains(sp.symbol))
-                throw new AutomatonNotWellDefinedException("non-alphabet symbol appears in transitions");
-        }
-        return this;
-    }
-
-}
-
-/**
-     * Finds regular expression in table or computes it if not there yet. (Used by {@link #toRegExp}.)
-     */
-    private RegExp.Node tableLookup(State p, State q, int k, Map<StatePair,RegExp.Node[]> table, Map<Integer,State> statemap) {
-        RegExp.Node x = table.get(new StatePair(p, q))[k];
-        if (x==null) {
-            if (k==0) {
-                x = new RegExp.EmptyLanguageNode();
-                for (char c : alphabet.symbols)
-                    if (delta(p,c)==q)
-                        x = new RegExp.UnionNode(x, new RegExp.SymbolNode(c));
-                if (p==q)
-                    x = new RegExp.UnionNode(x, new RegExp.EmptyStringNode());
-            } else {
-                State r = statemap.get(k);
-                RegExp.Node x1 = tableLookup(p, q, k-1, table, statemap);
-                RegExp.Node x2 = tableLookup(p, r, k-1, table, statemap);
-                RegExp.Node x3 = tableLookup(r, r, k-1, table, statemap);
-                RegExp.Node x4 = tableLookup(r, q, k-1, table, statemap);
-                x = new RegExp.UnionNode(x1, new RegExp.ConcatNode(x2, new RegExp.ConcatNode(new RegExp.StarNode(x3), x4)));
-
-            }
-            table.get(new StatePair(p, q))[k] = x;
-        }
-        return x;
-    }
-
-    /**
-     * Converts this automaton into an equivalent {@link RegExp} regular expression. [Martin, Th. 3.30]
-     */
-    public RegExp toRegExp() {
-        Map<Integer,State> statemap = new HashMap<Integer,State>();
-        Map<StatePair,RegExp.Node[]> table = new HashMap<StatePair,RegExp.Node[]>(); // fill out this table lazily
-        // initialize
-        int n = 0;
-        for (State p : states) {
-            statemap.put(++n, p); // states are numbered from 1 to states.size()
-            for (State q : states)
-                table.put(new StatePair(p, q), new RegExp.Node[states.size()+1]);
-        }
-        // construct the abstract syntax tree for the regular expression
-        RegExp.Node x = new RegExp.EmptyLanguageNode();
-        for (State p : accept)
-            x = new RegExp.UnionNode(x, tableLookup(initial, p, states.size(), table, statemap));
-        return new RegExp(x, alphabet);
-    }
-
-'''
