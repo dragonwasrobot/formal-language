@@ -7,6 +7,7 @@
 # Author: Peter Urbak
 # Version: 2012-04-28
 import copy
+import subprocess
 
 # --*-- The Finite Automata --*--
 
@@ -60,10 +61,42 @@ class FiniteAutomata(object):
 
     # --*-- Methods --*--
 
-    def toDot(self):
-        """Produces a Graphviz Dot representation of this automaton."""
-        # TODO
-        pass
+    def toDot(self, outputFile = "./fa.gv"):
+        """Creates a Graphviz Dot file (.gv) at the given path and also tries to
+        create a pdf version of the finite automata at the same time."""
+
+        outputString = "digraph finite automaton {\n\trankdir = LR;\n"
+
+        outputString += "\tstart [shape = point, color = white, " \
+            + "fontcolor = white];\n"
+
+        for state in self.states:
+            if state in self.accept:
+                outputString += "\t" + state + " [shape = doublecircle, " \
+                + "color = black, fontcolor = black, label = \"" + state \
+                + "\"];\n"
+            else:
+                outputString += "\t" + state + " [shape = circle, " \
+                + "color = black, fontcolor = black, label = \"" + state \
+                + "\"];\n"
+
+        outputString += "\tstart -> " + self.initial + ";\n"
+        for state in self.states:
+            for character in self.alphabet:
+                toState = self.delta(state, character)
+                outputString += "\t" + state + " -> " + toState \
+                    + " [ label = \"" + character + "\" ];\n"
+
+        outputString += "}\n"
+
+        # Create output file and convert to pdf using Graphviz.
+        f = open(outputFile, 'w')
+        f.write(outputString)
+        f.close()
+
+        pdfFile = outputFile.rstrip('.gv') + '.pdf'
+        subprocess.call(["dot", "-Tpdf", outputFile, "-o", pdfFile])
+
 
     def checkWellDefined(self):
         """Checks whether this automaton has been correctly defined, otherwise
@@ -167,7 +200,6 @@ class FiniteAutomata(object):
 
     def findReachableStates(self):
         """Finds the set of states that are reachable from the initial state."""
-        # TODO
         pass
 
     def removeUnreachableStates(self):
@@ -237,36 +269,10 @@ class FiniteAutomata(object):
         @type fa: FiniteAutomata.
         """
 
-        if self.alphabet != fa.alphabet:
-            raise IllegalArgumentError(fa.alphabet)
+        def acceptCriteria(q, r):
+            return q in self.accept and r in fa.accept
 
-        stateDictionary = {}
-        stateList = []
-        alphabet = self.alphabet
-        initial = ''
-        accept = []
-        transitions = {}
-
-        for q in self.states:
-            for r in fa.states:
-                state = q + r
-                stateDictionary[(q,r)] = state
-
-                if q in self.accept and r in fa.accept:
-                    accept.append(state)
-
-        for statePair, compositeState in stateDictionary.items():
-            stateList.append(compositeState)
-            for character in alphabet:
-                nextStateSelf = self.delta(statePair[0], character)
-                nextStateFA = fa.delta(statePair[1], character)
-                transitions[(compositeState,character)] = \
-                    stateDictionary[(nextStateSelf, nextStateFA)]
-
-        initial = stateDictionary[(self.initial, fa.initial)]
-        states = frozenset(stateList)
-
-        return FiniteAutomata(states, alphabet, initial, accept, transitions)
+        return self._mergeAutomatas(fa, acceptCriteria)
 
     def union(self, fa):
         """Returns a new automaton whose language is the union of the
@@ -282,36 +288,10 @@ class FiniteAutomata(object):
         @type fa: FiniteAutomata.
         """
 
-        if self.alphabet != fa.alphabet:
-            raise IllegalArgumentError(fa.alphabet)
+        def acceptCriteria(q, r):
+            return q in self.accept or r in fa.accept
 
-        stateDictionary = {}
-        stateList = []
-        alphabet = self.alphabet
-        initial = ''
-        accept = []
-        transitions = {}
-
-        for q in self.states:
-            for r in fa.states:
-                state = q + r
-                stateDictionary[(q,r)] = state
-
-                if q in self.accept or r in fa.accept:
-                    accept.append(state)
-
-        for statePair, compositeState in stateDictionary.items():
-            stateList.append(compositeState)
-            for character in alphabet:
-                nextStateSelf = self.delta(statePair[0], character)
-                nextStateFA = fa.delta(statePair[1], character)
-                transitions[(compositeState,character)] = \
-                    stateDictionary[(nextStateSelf, nextStateFA)]
-
-        initial = stateDictionary[(self.initial, fa.initial)]
-        states = frozenset(stateList)
-
-        return FiniteAutomata(states, alphabet, initial, accept, transitions)
+        return self._mergeAutomatas(fa, acceptCriteria)
 
     def minus(self, fa):
         """Returns a new automaton whose language is equal to the language of
@@ -324,6 +304,24 @@ class FiniteAutomata(object):
 
         @param fa: A Finite Automata to union with.
         @type fa: FiniteAutomata.
+        """
+
+        def acceptCriteria(q, r):
+            return q in self.accept and r not in fa.accept
+
+        return self._mergeAutomatas(fa, acceptCriteria)
+
+    def _mergeAutomatas(self, fa, acceptCriteria):
+        """Merges this automata with the given automata based on the specified
+        acceptCriteria.
+
+        @param fa: A Finite Automata to union with.
+        @type fa: FiniteAutomata.
+
+        @param acceptCriteria: A function which takes two states as arguments
+        and returns true if the composite state should be an accept state, false
+        otherwise.
+        @type acceptCriteria: function.
         """
 
         if self.alphabet != fa.alphabet:
@@ -341,7 +339,7 @@ class FiniteAutomata(object):
                 state = q + r
                 stateDictionary[(q,r)] = state
 
-                if q in self.accept and r not in fa.accept:
+                if acceptCriteria(q,r):
                     accept.append(state)
 
         for statePair, compositeState in stateDictionary.items():
@@ -356,6 +354,8 @@ class FiniteAutomata(object):
         states = frozenset(stateList)
 
         return FiniteAutomata(states, alphabet, initial, accept, transitions)
+
+
 
 # --*-- Exceptions --*--
 

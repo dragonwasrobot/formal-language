@@ -14,7 +14,18 @@ transitions = {('a', '0') : 'a', ('a', '1') : 'b',
 
 fa = FiniteAutomata(states, alphabet, initial, accept, transitions)
 
-# A faulty
+# Tests
+
+def test_toDot():
+    print fa.toDot()
+    assertTrue(True) # Can't really test this method automatically, have to
+    # verify by looking at the actual graph.
+
+def test_checkWellDefined():
+    # Positive Tests
+    # assertTrue(fa.checkWellDefined())
+    # Negative Tests
+    pass
 
 def test_numberOfStates():
     # Positive test
@@ -128,5 +139,7 @@ def test_minus():
     assert_false(compositeFA.accepts('1')) # ar->bs (reject)
     assert_false(compositeFA.accepts('00')) # ar->bs->br (reject)
 
+def test_findReachableStates():
+    pass
 
 # end-of-turing_machine_tests.py

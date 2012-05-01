@@ -26,6 +26,7 @@ Turing Machine.
   * Refactor:
     * Improve intersection/union/minus algorithm so that it uses a DFS to create
       the new FA to reduce the amount of invalid states.
+  * Documentation.
 
 * Push-down Automata.
   * Implement one.
