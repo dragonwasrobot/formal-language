@@ -10,7 +10,7 @@ Turing Machine.
 
 - **Author:** Peter Urbak, peter@dragonwasrobot.com
 - **Created:** 2012-04-15
-- **Last Modified:** 2012-04-27
+- **Last Modified:** 2012-05-01
 - **URL:** https://github.com/dragonwasrobot/formal-language
 - **License:** Gnu General Public License
 
@@ -23,6 +23,9 @@ Turing Machine.
   * Sanity check input:
     * Alphabet shouldn't be able to use special symbols
     * Alphabet symbols have length 1
+  * Refactor:
+    * Improve intersection/union/minus algorithm so that it uses a DFS to create
+      the new FA to reduce the amount of invalid states.
 
 * Push-down Automata.
   * Implement one.
