@@ -10,29 +10,31 @@ Turing Machine.
 
 - **Author:** Peter Urbak, peter@dragonwasrobot.com
 - **Created:** 2012-04-15
-- **Last Modified:** 2012-05-01
+- **Last Modified:** 2012-05-02
 - **URL:** https://github.com/dragonwasrobot/formal-language
 - **License:** Gnu General Public License
 
 ## To-do
 
+* General.
+  * Improve robustness of tests.
+
 * Finite Automata.
   * Fill out all the remaining stubs.
-  * Implement a Nondeterministic version.
-  * Create a set of test automatas.
   * Sanity check input:
-    * Alphabet shouldn't be able to use special symbols
-    * Alphabet symbols have length 1
+    * Alphabet shouldn't be able to use special symbols.
+    * Alphabet symbols have length 1.
   * Refactor:
-    * Improve intersection/union/minus algorithm so that it uses a DFS to create
-      the new FA to reduce the amount of invalid states.
+    * Improve intersection/union/minus algorithm so that it uses a DFS.
   * Documentation.
+  * Create a set of test machines.
+
+* Nondeterministic Finite Automata.
+  * Implement one.
 
 * Push-down Automata.
   * Implement one.
 
 * Turing Machine
   * Refactor
-  * Create a set of test automatas.
-  * Add anything that looks interesting from "Introduction to Languages and the
-     Theory of Computation""" [Martin].
+  * Create a set of test machines.

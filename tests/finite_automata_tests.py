@@ -17,9 +17,8 @@ fa = FiniteAutomata(states, alphabet, initial, accept, transitions)
 # Tests
 
 def test_toDot():
-    print fa.toDot()
-    assertTrue(True) # Can't really test this method automatically, have to
-    # verify by looking at the actual graph.
+    # print fa.toDot() # have to test this guy manually
+    pass
 
 def test_checkWellDefined():
     # Positive Tests
@@ -28,42 +27,84 @@ def test_checkWellDefined():
     pass
 
 def test_numberOfStates():
-    # Positive test
+    # Positive tests
     assert_equal(fa.getNumberOfStates(), 3)
 
 @raises(IllegalCharacterError)
 def test_addTransitions():
-    # Positive test
+    # Positive tests
     fa.addTransition('d', '0', 'd')
-    # Exception test
+    # Exception tests
     fa.addTransition('d', '2', 'd')
 
 @raises(IllegalCharacterError)
 def test_delta():
-    # Positive test
+    # Positive tests
     assert_equal('c', fa.delta('b','1'))
-    # Exception test
+    # Exception tests
     fa.delta('d', '2')
 
 @raises(IllegalCharacterError)
 def test_deltaStar():
-    # Positive test
+    # Positive tests
     assert_equal('c', fa.deltaStar('a','10111'))
-    # Exception test
+    # Exception tests
     fa.delta('a', '1012')
 
 def test_accepts():
-    # Postive test
+    # Postive tests
     assert_true(fa.accepts('10111'))
-    # Negative test
+    # Negative tests
     assert_false(fa.accepts('10110'))
 
 def test_complement():
-    # Postive test
+    # Postive tests
     faComp = fa.complement()
     assert_true(faComp.accepts('10110'))
-    # Negative test
+    # Negative tests
     assert_false(faComp.accepts('10111'))
+
+def test_findReachableStates():
+    # Positive tests
+    reachableStates = fa.findReachableStates()
+    assert_equal(reachableStates, frozenset(['a','b','c']))
+
+    fa.states = frozenset(['a','b','c','d','e'])
+    reachableStates = fa.findReachableStates()
+    assert_equal(reachableStates, frozenset(['a','b','c']))
+
+    fa.states = frozenset(['a','b','c']) # not sure if needed.
+
+def test_removeUnreachableStates():
+    m = fa.removeUnreachableStates()
+    assert_equal(m.states, frozenset(['a','b','c']))
+
+    fa.states = frozenset(['a','b','c','d','e'])
+    fa.transitions[('d','0')] = 'e'
+    fa.transitions[('e','1')] = 'a'
+
+    originalStates = ['a','b','c']
+    originalTransitions = {('c', '1') : 'c', ('a', '0') : 'a', ('a', '1') : 'b',
+                           ('b', '1'): 'c', ('b', '0'): 'a', ('c', '0'): 'a'}
+
+    m = fa.removeUnreachableStates()
+    assert_true(helper_setEquality(m.states, originalStates))
+    assert_equal(m.transitions, originalTransitions)
+
+    fa.states = frozenset(['a','b','c']) # not sure if needed.
+    del fa.transitions[('d','0')]
+    del fa.transitions[('e','1')]
+
+def helper_setEquality(Xs, Ys):
+    """Slow comparison, could probably be done faster with hashing."""
+    if len(Xs) != len(Ys):
+        return False
+
+    for x in Xs:
+        if x not in Ys:
+            return False
+
+    return True
 
 def test_intersection():
     statesM1 = frozenset(['a', 'b', 'c'])
@@ -138,8 +179,5 @@ def test_minus():
     assert_true(compositeFA.accepts('01')) # ar->bs->cr (accept)
     assert_false(compositeFA.accepts('1')) # ar->bs (reject)
     assert_false(compositeFA.accepts('00')) # ar->bs->br (reject)
-
-def test_findReachableStates():
-    pass
 
 # end-of-turing_machine_tests.py

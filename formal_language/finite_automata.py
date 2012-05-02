@@ -1,4 +1,4 @@
-# finite_automaata.py
+# finite_automata.py
 
 # An implementation of a (Deterministic) Finite Automata.
 # Finite Automatas are usually used in Formal Language Theory to reason about
@@ -8,6 +8,7 @@
 # Version: 2012-04-28
 import copy
 import subprocess
+from exceptions import *
 
 # --*-- The Finite Automata --*--
 
@@ -65,7 +66,7 @@ class FiniteAutomata(object):
         """Creates a Graphviz Dot file (.gv) at the given path and also tries to
         create a pdf version of the finite automata at the same time."""
 
-        outputString = "digraph finite automaton {\n\trankdir = LR;\n"
+        outputString = "digraph finite_automaton {\n\trankdir = LR;\n"
 
         outputString += "\tstart [shape = point, color = white, " \
             + "fontcolor = white];\n"
@@ -200,13 +201,38 @@ class FiniteAutomata(object):
 
     def findReachableStates(self):
         """Finds the set of states that are reachable from the initial state."""
-        pass
+
+        reachable = []
+        pending = []
+        pending.append(self.initial)
+
+        while len(pending) > 0:
+            q = pending.pop()
+            reachable.append(q)
+
+            for c in self.alphabet:
+                p = self.delta(q, c)
+                if p not in reachable:
+                    pending.append(p)
+
+        return frozenset(reachable)
 
     def removeUnreachableStates(self):
         """Returns a new automaton with the same language as this automaton
         but without unreachable states."""
-        # TODO
-        pass
+        reachable = self.findReachableStates()
+
+        states = self.states - (self.states - reachable)
+        alphabet = self.alphabet
+        initial = self.initial
+        accept = self.accept - (self.accept - reachable)
+        transitions = {}
+
+        for stateSymbolPair, resultState in self.transitions.items():
+            if stateSymbolPair[0] in states:
+                transitions[stateSymbolPair] = resultState
+
+        return FiniteAutomata(states, alphabet, initial, accept, transitions)
 
     def minimize(self):
         """Returns a new minimal automaton with the same language as this
@@ -354,46 +380,5 @@ class FiniteAutomata(object):
         states = frozenset(stateList)
 
         return FiniteAutomata(states, alphabet, initial, accept, transitions)
-
-
-
-# --*-- Exceptions --*--
-
-class IllegalArgumentError(Exception):
-    """This error is raised when an illegal argument has been passed to a
-    method."""
-
-    def __init__(self, argument):
-        """Initializes an IllegalArgumentError object."""
-        self.argument = argument
-
-    def __str__(self):
-        """Returns a the illegal argument."""
-        return repr(self.argument)
-
-
-class IllegalCharacterError(Exception):
-    """This error is raised whenever a character not found in a Finite Automatas
-    alphabet is trying to be used in some method context."""
-
-    def __init__(self, character):
-        """Initializes an IllegalCharacterError object."""
-        self.character = character
-
-    def __str__(self):
-        """Returns a description of the error which occured."""
-        return repr(self.character)
-
-class AutomatonNotWellDefinedException(Exception):
-    """This error is raised whenever a automaton has not been correctly
-    constructed according to its definition."""
-
-    def __init__(self, message):
-        """Initializes an IllegalCharacterError object."""
-        self.message = message
-
-    def __str__(self):
-        """Returns the error message of the Exception."""
-        return repr(self.message)
 
 # end-of-finite_automata.py
