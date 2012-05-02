@@ -247,8 +247,8 @@ class FiniteAutomata(object):
 
     def isEmpty(self):
         """Returns true if the language of the automaton is empty."""
-        # TODO
-        pass
+        # Check if there exists a state in 'accept' that is also reachable.
+        return len(self.findReachableStates() & self.accept) == 0
 
     def subsetOf(self, fa):
         """Returns true if the language of this automaton is a subset of the

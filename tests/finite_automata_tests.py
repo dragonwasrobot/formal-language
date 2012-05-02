@@ -106,6 +106,12 @@ def helper_setEquality(Xs, Ys):
 
     return True
 
+def test_isEmpty():
+    assert_false(fa.isEmpty())
+    emptyFA = FiniteAutomata(fa.states, fa.alphabet, fa.initial,
+                               frozenset(['d']), fa.transitions)
+    assert_true(emptyFA.isEmpty())
+
 def test_intersection():
     statesM1 = frozenset(['a', 'b', 'c'])
     alphabet = frozenset(['0','1'])
