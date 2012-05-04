@@ -3,18 +3,50 @@
 from nose.tools import *
 from formal_language.finite_automata import *
 
-# The FA which accepts all strings in {0,1}* ending in 11.
-states = frozenset(['a', 'b', 'c'])
-alphabet = frozenset(['0','1'])
-initial = 'a'
-accept = frozenset(['c'])
-transitions = {('a', '0') : 'a', ('a', '1') : 'b',
-               ('b', '0') : 'a', ('b', '1') : 'c',
-               ('c', '0') : 'a', ('c', '1') : 'c'}
+# Helper functions
 
-fa = FiniteAutomata(states, alphabet, initial, accept, transitions)
+def returnFreshFA():
+    """Returns the FA which accepts all strings in {0,1}* ending in 11."""
+    states = frozenset(['a', 'b', 'c'])
+    alphabet = frozenset(['0','1'])
+    initial = 'a'
+    accept = frozenset(['c'])
+    transitions = {('a', '0') : 'a', ('a', '1') : 'b',
+                   ('b', '0') : 'a', ('b', '1') : 'c',
+                   ('c', '0') : 'a', ('c', '1') : 'c'}
+
+    fa = FiniteAutomata(states, alphabet, initial, accept, transitions)
+    return fa
+
+def helper_setEquality(Xs, Ys):
+    """Slow comparison, could probably be done faster with hashing."""
+    if len(Xs) != len(Ys):
+        return False
+
+    for x in Xs:
+        if x not in Ys:
+            return False
+
+    return True
 
 # Tests
+
+@raises(IllegalCharacterError)
+def test_alphabet1():
+    fa = returnFreshFA()
+
+    # Positive
+    assert_true(fa.checkAlphabet())
+    # Exception
+    fa.alphabet = frozenset(['a','b','c','*','d','e'])
+    fa.checkAlphabet()
+
+@raises(IllegalArgumentError)
+def test_alphabet2():
+    fa = returnFreshFA()
+    # Exception
+    fa.alphabet = frozenset(['a','b','c','d','de','e'])
+    fa.checkAlphabet()
 
 def test_toDot():
     # print fa.toDot() # have to test this guy manually
@@ -27,11 +59,13 @@ def test_checkWellDefined():
     pass
 
 def test_numberOfStates():
+    fa = returnFreshFA()
     # Positive tests
     assert_equal(fa.getNumberOfStates(), 3)
 
 @raises(IllegalCharacterError)
 def test_addTransitions():
+    fa = returnFreshFA()
     # Positive tests
     fa.addTransition('d', '0', 'd')
     # Exception tests
@@ -39,6 +73,7 @@ def test_addTransitions():
 
 @raises(IllegalCharacterError)
 def test_delta():
+    fa = returnFreshFA()
     # Positive tests
     assert_equal('c', fa.delta('b','1'))
     # Exception tests
@@ -46,18 +81,21 @@ def test_delta():
 
 @raises(IllegalCharacterError)
 def test_deltaStar():
+    fa = returnFreshFA()
     # Positive tests
     assert_equal('c', fa.deltaStar('a','10111'))
     # Exception tests
     fa.delta('a', '1012')
 
 def test_accepts():
+    fa = returnFreshFA()
     # Postive tests
     assert_true(fa.accepts('10111'))
     # Negative tests
     assert_false(fa.accepts('10110'))
 
 def test_complement():
+    fa = returnFreshFA()
     # Postive tests
     faComp = fa.complement()
     assert_true(faComp.accepts('10110'))
@@ -65,6 +103,7 @@ def test_complement():
     assert_false(faComp.accepts('10111'))
 
 def test_findReachableStates():
+    fa = returnFreshFA()
     # Positive tests
     reachableStates = fa.findReachableStates()
     assert_equal(reachableStates, frozenset(['a','b','c']))
@@ -73,9 +112,8 @@ def test_findReachableStates():
     reachableStates = fa.findReachableStates()
     assert_equal(reachableStates, frozenset(['a','b','c']))
 
-    fa.states = frozenset(['a','b','c']) # not sure if needed.
-
 def test_removeUnreachableStates():
+    fa = returnFreshFA()
     m = fa.removeUnreachableStates()
     assert_equal(m.states, frozenset(['a','b','c']))
 
@@ -91,22 +129,8 @@ def test_removeUnreachableStates():
     assert_true(helper_setEquality(m.states, originalStates))
     assert_equal(m.transitions, originalTransitions)
 
-    fa.states = frozenset(['a','b','c']) # not sure if needed.
-    del fa.transitions[('d','0')]
-    del fa.transitions[('e','1')]
-
-def helper_setEquality(Xs, Ys):
-    """Slow comparison, could probably be done faster with hashing."""
-    if len(Xs) != len(Ys):
-        return False
-
-    for x in Xs:
-        if x not in Ys:
-            return False
-
-    return True
-
 def test_isEmpty():
+    fa = returnFreshFA()
     assert_false(fa.isEmpty())
     emptyFA = FiniteAutomata(fa.states, fa.alphabet, fa.initial,
                                frozenset(['d']), fa.transitions)

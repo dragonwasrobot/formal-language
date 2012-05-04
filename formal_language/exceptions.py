@@ -31,7 +31,7 @@ class IllegalCharacterError(Exception):
         """Returns a description of the error which occured."""
         return repr(self.character)
 
-class AutomatonNotWellDefinedException(Exception):
+class AutomatonNotWellDefinedError(Exception):
     """This error is raised whenever a automaton has not been correctly
     constructed according to its definition."""
 

@@ -58,9 +58,24 @@ class FiniteAutomata(object):
         self.accept = accept
         self.transitions = transitions
 
-        # TODO: Sanitize input, especially alphabet symbols.
+        self.checkAlphabet()
+        self.checkWellDefined()
 
     # --*-- Methods --*--
+
+    def checkAlphabet(self):
+        """Check whether the given alphabet is correctly defined, i.e. doesn't
+        contain any illegal symbols and all symbols are of length 1."""
+        illegalSymbols = frozenset(['#','%','+','*','(',')'])
+
+        if len(illegalSymbols & self.alphabet) > 0:
+            raise IllegalCharacterError("'#', '%', '+', '*', '(' and ')'"  \
+                                            + "are not allowed in the alphabet")
+
+        if len(max(self.alphabet, key=len)) > 1:
+            raise IllegalArgumentError("Alphabet symbols must have length" \
+                                           + "of exactly 1")
+        return True
 
     def toDot(self, outputFile = "./fa.gv"):
         """Creates a Graphviz Dot file (.gv) at the given path and also tries to
