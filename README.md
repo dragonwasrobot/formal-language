@@ -10,20 +10,17 @@ Turing Machine.
 
 - **Author:** Peter Urbak, peter@dragonwasrobot.com
 - **Created:** 2012-04-15
-- **Last Modified:** 2012-05-02
+- **Last Modified:** 2012-05-05
 - **URL:** https://github.com/dragonwasrobot/formal-language
 - **License:** Gnu General Public License
 
 ## To-do
 
 * General.
-  * Make sure that each test only tests one thing.
+  * Make sure that each test only tests one thing (TDD).
 
 * Finite Automata.
   * Fill out all the remaining stubs.
-  * Sanity check input:
-    * Alphabet shouldn't be able to use special symbols.
-    * Alphabet symbols have length 1.
   * Refactor:
     * Improve intersection/union/minus algorithm so that it uses a DFS.
   * Documentation.
