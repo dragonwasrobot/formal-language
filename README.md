@@ -17,7 +17,7 @@ Turing Machine.
 ## To-do
 
 * General.
-  * Improve robustness of tests.
+  * Make sure that each test only tests one thing.
 
 * Finite Automata.
   * Fill out all the remaining stubs.

@@ -58,14 +58,13 @@ class FiniteAutomata(object):
         self.accept = accept
         self.transitions = transitions
 
-        self.checkAlphabet()
         self.checkWellDefined()
 
     # --*-- Methods --*--
 
-    def checkAlphabet(self):
-        """Check whether the given alphabet is correctly defined, i.e. doesn't
-        contain any illegal symbols and all symbols are of length 1."""
+    def checkWellDefined(self):
+        """Checks that this automaton is well-defined. In particular, this
+        method checks that the transition function is total."""
         illegalSymbols = frozenset(['#','%','+','*','(',')'])
 
         if len(illegalSymbols & self.alphabet) > 0:
@@ -75,6 +74,40 @@ class FiniteAutomata(object):
         if len(max(self.alphabet, key=len)) > 1:
             raise IllegalArgumentError("Alphabet symbols must have length" \
                                            + "of exactly 1")
+
+        if self.states is None or self.alphabet is None \
+                or self.initial is None or self.accept is None \
+                or self.transitions is None:
+            raise AutomatonNotWellDefinedError("An argument was set to None.")
+
+        if self.initial not in self.states:
+            raise AutomatonNotWellDefinedError("The initial state is not in " \
+                                                   + "the state set.")
+
+        if len(self.accept & self.states) < len(self.accept):
+            raise AutomatonNotWellDefinedError("Not all accept states are in " \
+                                                   + "the state set.")
+
+        for state in self.states:
+            for symbol in self.alphabet:
+                try:
+                    toState = self.delta(state, symbol)
+                    if toState not in self.states:
+                        raise AutomatonNotWellDefinedError(\
+                            "There is a transition to a state which cannot be "\
+                                + "found in the state set.")
+                except KeyError:
+                    raise AutomatonNotWellDefinedError("Transition function " \
+                                                           + "is not total.")
+
+        for stateSymbolPair, resultState in self.transitions.items():
+            if stateSymbolPair[0] not in self.states:
+                raise AutomatonNotWellDefinedError(\
+                    "Transitions refer to a state not in state set.")
+            if stateSymbolPair[1] not in self.alphabet:
+                raise AutomatonNotWellDefinedError(\
+                    "Non-alphabet symbol appears in transitions.")
+
         return True
 
     def toDot(self, outputFile = "./fa.gv"):
@@ -112,14 +145,6 @@ class FiniteAutomata(object):
 
         pdfFile = outputFile.rstrip('.gv') + '.pdf'
         subprocess.call(["dot", "-Tpdf", outputFile, "-o", pdfFile])
-
-
-    def checkWellDefined(self):
-        """Checks whether this automaton has been correctly defined, otherwise
-        it throws one of a number of Exceptions depending on what violates the
-        definition."""
-        # TODO
-        pass
 
     def getNumberOfStates(self):
         """Returns the number of states of the Finite Automata."""
@@ -252,8 +277,10 @@ class FiniteAutomata(object):
     def minimize(self):
         """Returns a new minimal automaton with the same language as this
         automaton."""
-        # TODO (chapter 2.6)
-        pass
+        fa = self.removeUnreachableStates()
+        marks = set([])
+        stateList = fa.states
+        # todo
 
     def isFinite(self):
         """Returns true if the language of this automaton is finite."""
@@ -372,7 +399,7 @@ class FiniteAutomata(object):
         stateList = []
         alphabet = self.alphabet
         initial = ''
-        accept = []
+        acceptList = []
         transitions = {}
 
         for q in self.states:
@@ -381,7 +408,7 @@ class FiniteAutomata(object):
                 stateDictionary[(q,r)] = state
 
                 if acceptCriteria(q,r):
-                    accept.append(state)
+                    acceptList.append(state)
 
         for statePair, compositeState in stateDictionary.items():
             stateList.append(compositeState)
@@ -393,6 +420,7 @@ class FiniteAutomata(object):
 
         initial = stateDictionary[(self.initial, fa.initial)]
         states = frozenset(stateList)
+        accept = frozenset(acceptList)
 
         return FiniteAutomata(states, alphabet, initial, accept, transitions)
 
