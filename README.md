@@ -10,7 +10,7 @@ Turing Machine.
 
 - **Author:** Peter Urbak, peter@dragonwasrobot.com
 - **Created:** 2012-04-15
-- **Last Modified:** 2012-05-05
+- **Last Modified:** 2012-05-09
 - **URL:** https://github.com/dragonwasrobot/formal-language
 - **License:** Gnu General Public License
 
@@ -24,7 +24,7 @@ Turing Machine.
   * Refactor:
     * Improve intersection/union/minus algorithm so that it uses a DFS.
   * Documentation.
-  * Create a set of test machines.
+  * Create a set of test automatas.
 
 * Nondeterministic Finite Automata.
   * Implement one.

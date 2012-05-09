@@ -147,11 +147,6 @@ def test_accepts():
     # Negative tests
     assert_false(fa.accepts('10110'))
 
-# -*- toRegExp -*-
-
-def test_toRegExp():
-    pass
-
 # -*- complement -*-
 
 def test_complement():
@@ -306,5 +301,9 @@ def test_minus():
     assert_true(compositeFA.accepts('01')) # ar->bs->cr (accept)
     assert_false(compositeFA.accepts('1')) # ar->bs (reject)
     assert_false(compositeFA.accepts('00')) # ar->bs->br (reject)
+
+# -*- toNondeterministicFiniteAutomata -*-
+
+# -*- toRegularExpression -*-
 
 # end-of-finite_automata_tests.py

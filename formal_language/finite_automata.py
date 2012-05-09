@@ -1,16 +1,17 @@
 # finite_automata.py
 
 # An implementation of a (Deterministic) Finite Automata.
-# Finite Automatas are usually used in Formal Language Theory to reason about
+# Finite Automatas are used in Formal Language Theory to reason about
 # regular languages.
 #
 # Author: Peter Urbak
-# Version: 2012-04-28
+# Version: 2012-05-09
 import copy
 import subprocess
 from exceptions import *
+from nondeterministic_finite_automata import *
 
-# --*-- The Finite Automata --*--
+# --*-- Finite Automata --*--
 
 class FiniteAutomata(object):
     """A Finite Automata.
@@ -222,12 +223,6 @@ class FiniteAutomata(object):
         """
         return self.deltaStar(self.initial, s) in self.accept
 
-    def toRegExp(self):
-        """Converts the Finite Automata to its equivalent regular
-        expression."""
-        # TODO
-        pass
-
     def complement(self):
         """Constructs a new automaton that accepts the complement of the
         language of this automaton."""
@@ -275,7 +270,7 @@ class FiniteAutomata(object):
         return FiniteAutomata(states, alphabet, initial, accept, transitions)
 
     def minimize(self):
-        """Returns a new minimal automaton with the same language as this
+        """Constructs a new minimal automaton with the same language as this
         automaton."""
         fa = self.removeUnreachableStates()
         marks = set([])
@@ -284,8 +279,62 @@ class FiniteAutomata(object):
 
     def isFinite(self):
         """Returns true if the language of this automaton is finite."""
-        # TODO
-        pass
+        # The language is finite iff there is a reachable loop with a path to an
+        # accept state.
+        live = self._findLiveStates()
+        return not self._containsLoop(self.initial, live, set([]))
+
+    def _findLiveStates(self, s):
+        """Finds the set of states among 's' that can reach an accept state.
+
+        @param s: a set of states
+        @type s: set
+        """
+
+        back = {} # p in back[q] iff delta(p,c) = q for some c
+        for p in s:
+            back[p] = set([])
+
+        for p in s:
+            for symbol in self.alphabet:
+                q = self.delta(q, symbol)
+                if q in s:
+                    back[q].add(p)
+
+        live = set(self.accept)
+        pending = set(self.accept)
+        while len(pending) > 0:
+            q = pending.__iter__().next()
+            pending.remove(q)
+            for p in back[q]:
+                if p not in live:
+                    live.add(p)
+                    pending.add(p)
+
+        return live
+
+    def _containsLoop(self, p, s, path):
+        """Check whether there is a loop in the set 's' reachable from the state
+        'p' through the states in path.
+
+        @param p: a state
+        @type p: str
+
+        @param s: a set of states
+        @type s: set
+
+        @param path: a set of states
+        @type path: set
+        """
+
+        path.add(p)
+        for symbol in self.alphabet:
+            q = self.delta(p, symbol)
+            if q in s and (q in path or self._containsLoop(self, q, s, path)):
+                return True
+
+        path.remove(p)
+        return False
 
     def isEmpty(self):
         """Returns true if the language of the automaton is empty."""
@@ -296,18 +345,19 @@ class FiniteAutomata(object):
         """Returns true if the language of this automaton is a subset of the
         language of the given automaton."""
         # TODO
-        pass
+        return False
 
     def equals(self, fa):
-        """Returns true if the language of this automaton is equal to the
+        """Checks whethe the language of this automaton is equal to the
         language of the given automaton."""
-        # TODO
-        pass
+        if not isinstance(fa, FiniteAutomata):
+            return False
+        return self.subsetOf(fa) and fa.subsetOf(self)
 
     def getShortestString(self):
         """Returns the shortest string that is accepted by this
         automaton. Returns None if the language is empty."""
-        # TODO (Dijkstra?)
+        # TODO Shortest path to accept state.
         pass
 
     def intersection(self, fa):
@@ -423,5 +473,20 @@ class FiniteAutomata(object):
         accept = frozenset(acceptList)
 
         return FiniteAutomata(states, alphabet, initial, accept, transitions)
+
+    def toNondeterministicFiniteAutomata(self):
+        """Converts this Finite Automata into an equivalent Nondeterministic
+        Finite Automata."""
+        return NondeterministicFiniteAutomata(self.states, self.alphabet,
+        self.initial, self.accept, copy.copy(self.transitions))
+
+    def toRegularExpression(self):
+        """Converts this Automaton into an equivalent Regular Expression."""
+        pass
+
+    def _tableLookup(self, p, q, k, table, statemap):
+        """Finds regular expression in table or computes it if not there yet."""
+        pass
+
 
 # end-of-finite_automata.py
