@@ -17,7 +17,7 @@ class FiniteAutomata(object):
     """A Finite Automata.
 
     Definition 1: A Finite Automaton
-    A finite automaton (FA) is a 5-tuple (Q, Σ, q_0, A, \delta), where
+    A finite automaton (FA) is a 5-tuple (Q, \Sigma, q_0, A, \delta), where
 
     Q is a finite set of states;
     \Sigma is a finite input alphabet;
